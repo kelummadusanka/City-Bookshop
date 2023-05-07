@@ -117,7 +117,7 @@ public class ExcelDatabase {
                     String author = row.getCell(2).getStringCellValue();
                     double price = row.getCell(3).getNumericCellValue();
                     int quantity = (int) row.getCell(4).getNumericCellValue();
-                    int categoryId = (int) row.getCell(5).getNumericCellValue();
+                    String categoryId = row.getCell(5).getStringCellValue();
 
                     Book book = new Book(id, title, author, price, quantity, categoryId);
                     books.add(book);

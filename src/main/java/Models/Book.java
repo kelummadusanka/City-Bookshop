@@ -8,9 +8,9 @@ public class Book implements IBook {
     private String author;
     private double price;
     private int quantity;
-    private int bookCategory;
+    private String bookCategory;
 
-    public Book(int id, String title, String author, double price, int quantity, int bookCategory) {
+    public Book(int id, String title, String author, double price, int quantity, String bookCategory) {
         this.id = id;
         this.title = title;
         this.author = author;
@@ -55,12 +55,12 @@ public class Book implements IBook {
     }
 
     @Override
-    public void setCategory(int categoryId) {
-        this.bookCategory = categoryId;
+    public void setCategory(String category) {
+        this.bookCategory = category;
     }
 
     @Override
-    public int getCategory() {
+    public String getCategory() {
         return bookCategory;
     }
 }

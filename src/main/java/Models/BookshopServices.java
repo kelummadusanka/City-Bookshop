@@ -42,11 +42,11 @@ ExcelDatabase excelDatabase;
     }
 
     @Override
-    public List<Book> searchBooksByCategory(int category) {
+    public List<Book> searchBooksByCategory(String category) {
         List<Book> filteredBooks = new ArrayList<>();
         List<Book> allBooks = getAllBooks();
         for (Book book : allBooks) {
-            if (book.getCategory() == category) {
+            if (book.getCategory().equals(category)) {
                 filteredBooks.add(book);
             }
         }

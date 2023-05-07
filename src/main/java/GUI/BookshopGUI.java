@@ -2,11 +2,14 @@ package GUI;
 
 import Models.Book;
 import Models.BookshopServices;
+import Models.Manager;
+import Models.UserAccount;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 
 public class BookshopGUI implements ActionListener {
@@ -18,6 +21,9 @@ public class BookshopGUI implements ActionListener {
     private JPanel searchPanel;
     private JPanel resultsPanel;
     private JTabbedPane tabbedPane;
+    private JScrollPane scrollPane;
+    private JPanel allBookPanel;
+
 
     private JTable booksTable;
     private JLabel titleLabel;
@@ -35,6 +41,8 @@ public class BookshopGUI implements ActionListener {
     private JButton addButton;
     private JButton searchButton;
     private JButton clearButton;
+    private JButton addCategoryButton;
+    private JButton addAcountButton;
     private JTextField searchTextField;
     private JLabel searchByLabel;
     private JRadioButton nameRadioButton;
@@ -47,23 +55,39 @@ public class BookshopGUI implements ActionListener {
     private JTextField maxTextField;
     private JPanel minMaxPannel;
 
-    public BookshopGUI(BookshopServices bookshopServices) {
+
+    private JTextField userIdField;
+    private JTextField nameField;
+    private JComboBox<String> roleComboBox;
+    private JButton createAccountButton;
+
+    private String role;
+
+    public BookshopGUI(BookshopServices bookshopServices,String role) {
         this.bookshopServices = bookshopServices;
+        this.role = role;
         createGUI();
     }
 
     private void createGUI() {
 
-
         mainFrame = new JFrame("Bookshop");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setPreferredSize(new Dimension(900, 600));
         contentPanel = new JPanel(new BorderLayout());
         searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        resultsPanel = new JPanel(new BorderLayout());
-        minMaxPannel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        resultsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
+        resultsPanel.setPreferredSize(new Dimension(900, 10000));
+        allBookPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
 
+        scrollPane = new JScrollPane(resultsPanel);
+        scrollPane.setPreferredSize(new Dimension(900, 600));
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+
+        minMaxPannel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         bookIdLabel = new JLabel("Book Id");
         quantityLabel = new JLabel("Quantity");
         titleLabel = new JLabel("Title");
@@ -87,6 +111,10 @@ public class BookshopGUI implements ActionListener {
 
         addButton = new JButton("Add Book");
         addButton.addActionListener(this);
+        addAcountButton = new JButton("Add Account");
+        addAcountButton.addActionListener(this);
+        addCategoryButton = new JButton("Add Category");
+        addCategoryButton.addActionListener(this);
 
         minLabel = new JLabel("Min Price:");
         minTextField = new JTextField(5);
@@ -114,16 +142,37 @@ public class BookshopGUI implements ActionListener {
         minMaxPannel.add(maxTextField);
         minMaxPannel.setVisible(false);
 
-
         booksTable = new JTable();
-        resultsPanel.add(new JScrollPane(booksTable), BorderLayout.CENTER);
+        BooksTableModel bookModel = new BooksTableModel(bookshopServices.getAllBooks());
+        booksTable.setModel(bookModel);
 
         tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("Add Book", createAddBookPanel());
         tabbedPane.addTab("Search Books", createSearchPanel());
-        tabbedPane.addTab("All Books", resultsPanel);
+        tabbedPane.addTab("All Books", createAllBookPanel());
+        tabbedPane.addTab("Stock Details", createStockPanel());
+        tabbedPane.addTab("Add Book", createAddBookPanel());
+        tabbedPane.addTab("Add Category", createAddCatergoryPanel());
+        tabbedPane.addTab("Create Account", createAddAccountPanel());
+
+
+        // Set the visibility of the tabs based on the user's role
+        if (role.equals("Manager")) {
+
+            tabbedPane.setEnabledAt(3, true);
+            tabbedPane.setEnabledAt(4, true);
+        }
+        else if(role.equals("Cashier")) {
+
+            tabbedPane.setEnabledAt(3, false);
+            tabbedPane.setEnabledAt(4, false);
+        }
 
         //mainPanel.add(searchPanel, BorderLayout.NORTH);
+        titleLabel = new JLabel("Hi, " + role);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 20, 10));
+
+        contentPanel.add(titleLabel, BorderLayout.NORTH);
         contentPanel.add(tabbedPane, BorderLayout.CENTER);
         mainPanel.add(contentPanel, BorderLayout.CENTER);
 
@@ -134,6 +183,138 @@ public class BookshopGUI implements ActionListener {
         priceRadioButton.addActionListener(this);
         nameRadioButton.addActionListener(this);
         categoryRadioButton.addActionListener(this);
+    }
+
+
+    private JPanel createAddCatergoryPanel() {
+        JPanel inputPanel = new JPanel(new GridBagLayout());
+        inputPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(10, 10, 10, 10);
+
+        JLabel categoryIdLabel = new JLabel("Category ID:");
+        categoryIdLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        inputPanel.add(categoryIdLabel, gbc);
+
+        JTextField categoryIdField = new JTextField(20);
+        categoryIdField.setFont(new Font("Arial", Font.PLAIN, 14));
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        inputPanel.add(categoryIdField, gbc);
+
+        JLabel categoryNameLabel = new JLabel("Category Name:");
+        categoryNameLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        inputPanel.add(categoryNameLabel, gbc);
+
+        JTextField categoryNameField = new JTextField(20);
+        categoryNameField.setFont(new Font("Arial", Font.PLAIN, 14));
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        inputPanel.add(categoryNameField, gbc);
+
+        JLabel categoryDescriptionLabel = new JLabel("Category Description:");
+        categoryDescriptionLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        inputPanel.add(categoryDescriptionLabel, gbc);
+
+        JTextField categoryDescriptionField = new JTextField(20);
+        categoryDescriptionField.setFont(new Font("Arial", Font.PLAIN, 14));
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        inputPanel.add(categoryDescriptionField, gbc);
+
+        addCategoryButton.setFont(new Font("Arial", Font.PLAIN, 14));
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        gbc.anchor = GridBagConstraints.CENTER;
+        inputPanel.add(addCategoryButton, gbc);
+
+        return inputPanel;
+    }
+
+
+    private JPanel createStockPanel(){
+        JPanel panel = new JPanel();
+        //StockDetails stockDetails = new StockDetails(bookshopServices.getAllBooks());
+        panel = StockDetails.getStockDetails(bookshopServices.getAllBooks());
+        return  panel;
+    }
+
+    private JPanel createAddAccountPanel() {
+        JPanel inputPanel = new JPanel(new GridBagLayout());
+        inputPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(10, 10, 10, 10);
+
+        JLabel userIdLabel = new JLabel("User ID:");
+        userIdLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        inputPanel.add(userIdLabel, gbc);
+
+        userIdField = new JTextField(20);
+        userIdField.setFont(new Font("Arial", Font.PLAIN, 14));
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        inputPanel.add(userIdField, gbc);
+
+        JLabel nameLabel = new JLabel("Name:");
+        nameLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        inputPanel.add(nameLabel, gbc);
+
+        nameField = new JTextField(20);
+        nameField.setFont(new Font("Arial", Font.PLAIN, 14));
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        inputPanel.add(nameField, gbc);
+
+        JLabel roleLabel = new JLabel("Role:");
+        roleLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        inputPanel.add(roleLabel, gbc);
+
+        String[] roles = {"Cashier", "Manager", "Employee"};
+        roleComboBox = new JComboBox<>(roles);
+        roleComboBox.setFont(new Font("Arial", Font.PLAIN, 14));
+        gbc.gridx = 1;
+        gbc.gridy = 2;
+        inputPanel.add(roleComboBox, gbc);
+
+        addAcountButton.setFont(new Font("Arial", Font.PLAIN, 14));
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        gbc.anchor = GridBagConstraints.CENTER;
+        inputPanel.add(addAcountButton, gbc);
+
+        return inputPanel;
+    }
+
+
+    private JPanel createAllBookPanel() {
+        booksTable = new JTable();
+        BooksTableModel model = new BooksTableModel(bookshopServices.getAllBooks());
+        booksTable.setModel(model);
+
+        JPanel allBookPanel = new JPanel(new BorderLayout());
+        allBookPanel.add(new JScrollPane(booksTable), BorderLayout.CENTER);
+
+        return allBookPanel;
     }
 
     private JPanel createAddBookPanel() {
@@ -200,31 +381,63 @@ public class BookshopGUI implements ActionListener {
         return addBookPanel;
     }
 
-
-    private JPanel createSearchPanel() {
-        JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10)); // Add spacing between components
-        searchPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Add an empty border for padding
+    private JPanel createSerchBar(){
+        JPanel searchBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10)); // Add spacing between components
+        searchBar.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Add an empty border for padding
 
         // Add components to the search panel with appropriate margins
-        searchPanel.add(searchByLabel);
-        searchPanel.add(nameRadioButton);
-        searchPanel.add(priceRadioButton);
-        searchPanel.add(categoryRadioButton);
-        searchPanel.add(searchTextField);
-        searchPanel.add(minMaxPannel);
-        searchPanel.add(searchButton);
-        searchPanel.add(clearButton);
+        searchBar.add(searchByLabel);
+        searchBar.add(nameRadioButton);
+        searchBar.add(priceRadioButton);
+        searchBar.add(categoryRadioButton);
+        searchBar.add(searchTextField);
+        searchBar.add(minMaxPannel);
+        searchBar.add(searchButton);
+        searchBar.add(clearButton);
 
-        JPanel searchPanel1 = new JPanel(new BorderLayout());
-        booksTable = new JTable();
-        searchPanel1.add(searchPanel, BorderLayout.NORTH);
-        searchPanel1.add(new JScrollPane(booksTable), BorderLayout.CENTER);
-        return searchPanel1;
+        return searchBar;
     }
+
+    private JPanel createSearchPanel() {
+
+        JPanel searchPanel = new JPanel(new BorderLayout());
+        booksTable = new JTable();
+        searchPanel.add(createSerchBar(), BorderLayout.NORTH);
+        searchPanel.add(scrollPane, BorderLayout.CENTER);
+
+        //searchPanel.add(new JScrollPane(booksTable), BorderLayout.CENTER);
+        return searchPanel;
+    }
+
+    private JPanel createCardPanel(Book book) {
+        JPanel cardPanel = new JPanel(new BorderLayout());
+        cardPanel.setPreferredSize(new Dimension(200, 300));
+
+        cardPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
+        JLabel titleLabel = new JLabel(book.getTitle(), SwingConstants.CENTER);
+        JLabel authorLabel = new JLabel(book.getAuthor(), SwingConstants.CENTER);
+        JLabel priceLabel = new JLabel(String.valueOf(book.getPrice()), SwingConstants.CENTER);
+        JLabel categoryLabel = new JLabel(book.getCategory().toString(), SwingConstants.CENTER);
+        JLabel quantityLabel = new JLabel("Available: "+ String.valueOf(book.getQuantity()), SwingConstants.CENTER);
+
+        JPanel labelsPanel = new JPanel(new GridLayout(5, 1));
+        labelsPanel.add(titleLabel);
+        labelsPanel.add(authorLabel);
+        labelsPanel.add(priceLabel);
+        labelsPanel.add(categoryLabel);
+        labelsPanel.add(quantityLabel);
+
+        cardPanel.add(labelsPanel, BorderLayout.CENTER);
+
+        return cardPanel;
+    }
+
 
 
     @Override
     public void actionPerformed(ActionEvent e) {
+
         if (e.getSource() == addButton) {
 
             try {
@@ -235,11 +448,31 @@ public class BookshopGUI implements ActionListener {
                 int quantity = Integer.parseInt(quantityTextField.getText());
                 int bookId = Integer.parseInt(bookIdTextField.getText());
 
-                Book book = new Book(bookId,title, author, price,quantity, 5);// reset...........................................................................................
+                Book book = new Book(bookId,title, author, price,quantity, category);
                 bookshopServices.addBook(book);
 
                 JOptionPane.showMessageDialog(mainFrame, "Book added successfully.");
                 clearAddBookFields();
+            }
+            catch (IllegalArgumentException ex){
+                JOptionPane.showMessageDialog(mainFrame, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+
+
+
+        }
+        if (e.getSource() == addAcountButton) {
+
+            try {
+                String name = nameField.getText();
+                int userId = Integer.parseInt(userIdField.getText());
+                String role = (String) roleComboBox.getSelectedItem();
+
+                bookshopServices.createAccount(userId,name,role);
+
+                JOptionPane.showMessageDialog(mainFrame, "Account added successfully.");
+                clearAdcountFields();
             }
             catch (IllegalArgumentException ex){
                 JOptionPane.showMessageDialog(mainFrame, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -258,6 +491,7 @@ public class BookshopGUI implements ActionListener {
             minMaxPannel.setVisible(false);
         }
         if (nameRadioButton.isSelected()) {
+
             searchTextField.setVisible(true);
             minMaxPannel.setVisible(false);
         }
@@ -274,21 +508,40 @@ public class BookshopGUI implements ActionListener {
                 double max = Integer.parseInt(maxTextField.getText());
                 results = bookshopServices.searchBooksByPrice(min,max);
             } else if (categoryRadioButton.isSelected()) {
-                results = bookshopServices.searchBooksByCategory(2);// reset.............................................................
+                String category = categoryComboBox.getSelectedItem().toString();
+                results = bookshopServices.searchBooksByCategory(category);// reset.............................................................
             }
-            if (results != null) {
-                BooksTableModel model = new BooksTableModel(results);
-                booksTable.setModel(model);
-           } else {
-                JOptionPane.showMessageDialog(mainFrame, "No results found.");
+
+            if (results != null)
+            {
+
+                resultsPanel.removeAll();
+                for (Book book : results) {
+                    JPanel cardPanel = createCardPanel(book);
+                    resultsPanel.add(cardPanel);
+                }
+
+                mainFrame.revalidate();
+                mainFrame.repaint();
+
             }
+            if(results.isEmpty()){
+                JOptionPane.showMessageDialog(mainFrame, "No Results! " , "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
         }
         else if (e.getSource() == clearButton) {
-           BooksTableModel model = new BooksTableModel(bookshopServices.getAllBooks());
-           booksTable.setModel(model);
+           resultsPanel.removeAll();
+            mainFrame.revalidate();
+            mainFrame.repaint();
        }
 
+    }
 
+    private void clearAdcountFields() {
+        nameField.setText("");
+        userIdField.setText("");
+        roleComboBox.setSelectedIndex(0);
     }
 
     private void clearAddBookFields() {
@@ -299,8 +552,6 @@ public class BookshopGUI implements ActionListener {
         bookIdTextField.setText("");
         categoryComboBox.setSelectedIndex(0);
     }
-
-
 
 }
 

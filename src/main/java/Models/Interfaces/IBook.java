@@ -8,6 +8,6 @@ public interface IBook {
     double getPrice();
     int getQuantity();
     void setQuantity(int quantity);
-    void setCategory(int categoryId);
-    int getCategory();
+    void setCategory(String categoryId);
+    String getCategory();
 }

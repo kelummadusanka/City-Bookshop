@@ -7,7 +7,7 @@ public interface Services {
 
     List<Book> searchBooksByName(String searchQuery);
     List<Book> searchBooksByPrice(double minPrice, double maxPrice);
-    List<Book> searchBooksByCategory(int category);
+    List<Book> searchBooksByCategory(String category);
 
     boolean createAccount(int id, String name, String type);
     boolean addBook(Book book);
