@@ -1,9 +1,6 @@
 package GUI;
 
-import Models.Book;
-import Models.BookshopServices;
-import Models.Manager;
-import Models.UserAccount;
+import Models.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,7 +21,6 @@ public class BookshopGUI implements ActionListener {
     private JScrollPane scrollPane;
     private JPanel allBookPanel;
 
-
     private JTable booksTable;
     private JLabel titleLabel;
     private JLabel authorLabel;
@@ -32,6 +28,13 @@ public class BookshopGUI implements ActionListener {
     private JLabel categoryLabel;
     private JLabel quantityLabel;
     private JLabel bookIdLabel;
+    private JLabel categoryIdLabel;
+    private JLabel categoryNameLabel;
+    private  JLabel categoryDescriptionLabel;
+
+    private JTextField categoryIdField;
+    private JTextField categoryNameField;
+    private JTextField categoryDescriptionField;
     private JTextField quantityTextField;;
     private JTextField bookIdTextField;
     private JTextField titleTextField;
@@ -196,37 +199,37 @@ public class BookshopGUI implements ActionListener {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(10, 10, 10, 10);
 
-        JLabel categoryIdLabel = new JLabel("Category ID:");
+        categoryIdLabel = new JLabel("Category ID:");
         categoryIdLabel.setFont(new Font("Arial", Font.PLAIN, 14));
         gbc.gridx = 0;
         gbc.gridy = 0;
         inputPanel.add(categoryIdLabel, gbc);
 
-        JTextField categoryIdField = new JTextField(20);
+        categoryIdField = new JTextField(20);
         categoryIdField.setFont(new Font("Arial", Font.PLAIN, 14));
         gbc.gridx = 1;
         gbc.gridy = 0;
         inputPanel.add(categoryIdField, gbc);
 
-        JLabel categoryNameLabel = new JLabel("Category Name:");
+        categoryNameLabel = new JLabel("Category Name:");
         categoryNameLabel.setFont(new Font("Arial", Font.PLAIN, 14));
         gbc.gridx = 0;
         gbc.gridy = 1;
         inputPanel.add(categoryNameLabel, gbc);
 
-        JTextField categoryNameField = new JTextField(20);
+        categoryNameField = new JTextField(20);
         categoryNameField.setFont(new Font("Arial", Font.PLAIN, 14));
         gbc.gridx = 1;
         gbc.gridy = 1;
         inputPanel.add(categoryNameField, gbc);
 
-        JLabel categoryDescriptionLabel = new JLabel("Category Description:");
+        categoryDescriptionLabel = new JLabel("Category Description:");
         categoryDescriptionLabel.setFont(new Font("Arial", Font.PLAIN, 14));
         gbc.gridx = 0;
         gbc.gridy = 2;
         inputPanel.add(categoryDescriptionLabel, gbc);
 
-        JTextField categoryDescriptionField = new JTextField(20);
+        categoryDescriptionField = new JTextField(20);
         categoryDescriptionField.setFont(new Font("Arial", Font.PLAIN, 14));
         gbc.gridx = 1;
         gbc.gridy = 2;
@@ -509,7 +512,7 @@ public class BookshopGUI implements ActionListener {
                 results = bookshopServices.searchBooksByPrice(min,max);
             } else if (categoryRadioButton.isSelected()) {
                 String category = categoryComboBox.getSelectedItem().toString();
-                results = bookshopServices.searchBooksByCategory(category);// reset.............................................................
+                results = bookshopServices.searchBooksByCategory(category);
             }
 
             if (results != null)
@@ -530,11 +533,27 @@ public class BookshopGUI implements ActionListener {
             }
 
         }
-        else if (e.getSource() == clearButton) {
+        if (e.getSource() == clearButton) {
            resultsPanel.removeAll();
             mainFrame.revalidate();
             mainFrame.repaint();
        }
+        if(e.getSource()==addCategoryButton){
+            try{
+
+                int categoryId = Integer.parseInt(categoryIdField.getText());
+                String categoryName = categoryNameField.getText();
+                String categoryDes = categoryDescriptionField.getText();
+                bookshopServices.addCategory(new BookCategory(categoryId,categoryName,categoryDes));
+                JOptionPane.showMessageDialog(mainFrame, "Category added successfully.");
+                clearAdcountFields();
+            }
+            catch (IllegalArgumentException ex){
+                JOptionPane.showMessageDialog(mainFrame, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+
+            }
+
+        }
 
     }
 
