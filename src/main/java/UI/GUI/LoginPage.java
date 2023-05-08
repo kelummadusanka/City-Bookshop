@@ -1,90 +1,29 @@
-//package GUI;
-//
-//import Database.ExcelDatabase;
-//import Models.BookshopServices;
-//
-//import javax.swing.*;
-//import java.awt.*;
-//import java.awt.event.ActionEvent;
-//import java.awt.event.ActionListener;
-//
-//public class LoginPage extends JFrame {
-//    private JButton managerButton;
-//    private JButton cashierButton;
-//    private JPanel loginPanel;
-//
-//    public LoginPage() {
-//        setTitle("Login Page");
-//        setSize(300, 200);
-//        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-//
-//        loginPanel = new JPanel();
-//        loginPanel.setLayout(new GridLayout(2, 1, 10, 10));
-//
-//        managerButton = new JButton("Manager");
-//        managerButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                openManagerDashboard();
-//            }
-//        });
-//        loginPanel.add(managerButton);
-//
-//        cashierButton = new JButton("Cashier");
-//        cashierButton.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                openCashierDashboard();
-//            }
-//        });
-//        loginPanel.add(cashierButton);
-//
-//        getContentPane().add(loginPanel);
-//        setVisible(true);
-//    }
-//
-//    private void openManagerDashboard() {
-//        // Code to open Manager dashboard goes here
-//        System.out.println("Manager Dashboard opened.");
-//        setVisible(false);
-//        ExcelDatabase excelDatabase = new ExcelDatabase();
-//        BookshopServices bookshopServices = new BookshopServices(excelDatabase);
-//
-//        BookshopGUI bookshopGUI = new BookshopGUI(bookshopServices,"Manager");
-//
-//    }
-//
-//    private void openCashierDashboard() {
-//        // Code to open Cashier dashboard goes here
-//        System.out.println("Cashier Dashboard opened.");
-//        setVisible(false);
-//        ExcelDatabase excelDatabase = new ExcelDatabase();
-//        BookshopServices bookshopServices = new BookshopServices(excelDatabase);
-//
-//        BookshopGUI bookshopGUI = new BookshopGUI(bookshopServices, "Cashier");
-//    }
-//
-//}
+package UI.GUI;
 
-
-package GUI;
-
-import Database.ExcelDatabase;
 import Models.BookshopServices;
+import UI.UI;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class LoginPage extends JFrame {
+public class LoginPage extends JFrame implements UI {
+    private BookshopServices bookshopServices;
     private JButton managerButton;
     private JButton cashierButton;
     private JPanel loginPanel;
     private JLabel titleLabel;
     private JLabel imageLabel;
 
-    public LoginPage() {
+    public LoginPage(BookshopServices bookshopServices) {
+        this.bookshopServices = bookshopServices;
+        createLoginPage(bookshopServices);
+    }
+
+
+    private void createLoginPage(BookshopServices bookshopServices) {
+
         setTitle("Bookshop Management System");
         setSize(600, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -97,7 +36,7 @@ public class LoginPage extends JFrame {
         gbc.insets = new Insets(10, 10, 10, 10);
 
         // Add a title label to the panel
-        titleLabel = new JLabel("Welcome to the Bookshop Management System");
+        titleLabel = new JLabel("              Welcome to the City Bookshop");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -167,22 +106,16 @@ public class LoginPage extends JFrame {
         // Code to open Manager dashboard goes here
         System.out.println("Manager Dashboard opened.");
         setVisible(false);
-        ExcelDatabase excelDatabase = new ExcelDatabase();
-        BookshopServices bookshopServices = new BookshopServices(excelDatabase);
-
-        BookshopGUI bookshopGUI = new BookshopGUI(bookshopServices,"Manager");
+        Dashboard dashboard = new Dashboard(bookshopServices,"Manager");
+        dashboard.show();
 
     }
-
-
 
     private void openCashierDashboard() {
         // Code to open Cashier dashboard goes here
         System.out.println("Cashier Dashboard opened.");
         setVisible(false);
-        ExcelDatabase excelDatabase = new ExcelDatabase();
-        BookshopServices bookshopServices = new BookshopServices(excelDatabase);
-
-        BookshopGUI bookshopGUI = new BookshopGUI(bookshopServices, "Cashier");
+        Dashboard dashboard = new Dashboard(bookshopServices, "Cashier");
+        dashboard.show();
     }
 }

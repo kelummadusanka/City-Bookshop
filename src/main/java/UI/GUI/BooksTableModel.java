@@ -1,4 +1,4 @@
-package GUI;
+package UI.GUI;
 
 import Models.Book;
 import Models.Interfaces.IBook;

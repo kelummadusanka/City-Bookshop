@@ -24,7 +24,7 @@ public class ExcelDatabase {
     private String filename;
 
     public ExcelDatabase() {
-        filename = "src/main/java/Database/ExcelDB.xlsx";
+        filename = "src/main/resources//ExcelDB.xlsx";
 
 
         File file = new File(filename);
@@ -227,8 +227,6 @@ public class ExcelDatabase {
 
         return accounts;
     }
-
-
 
 
 

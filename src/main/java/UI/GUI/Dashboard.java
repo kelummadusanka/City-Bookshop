@@ -1,15 +1,16 @@
-package GUI;
+package UI.GUI;
 
 import Models.*;
+import UI.UI;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class BookshopGUI implements ActionListener {
+public class Dashboard implements ActionListener, UI {
     private BookshopServices bookshopServices;
 
     private JFrame mainFrame;
@@ -66,9 +67,13 @@ public class BookshopGUI implements ActionListener {
 
     private String role;
 
-    public BookshopGUI(BookshopServices bookshopServices,String role) {
+    public Dashboard(BookshopServices bookshopServices, String role) {
         this.bookshopServices = bookshopServices;
         this.role = role;
+
+    }
+    @Override
+    public void show() {
         createGUI();
     }
 
@@ -76,6 +81,7 @@ public class BookshopGUI implements ActionListener {
 
         mainFrame = new JFrame("Bookshop");
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
 
         mainPanel = new JPanel(new BorderLayout());
         mainPanel.setPreferredSize(new Dimension(900, 600));
@@ -154,7 +160,7 @@ public class BookshopGUI implements ActionListener {
         tabbedPane.addTab("All Books", createAllBookPanel());
         tabbedPane.addTab("Stock Details", createStockPanel());
         tabbedPane.addTab("Add Book", createAddBookPanel());
-        tabbedPane.addTab("Add Category", createAddCatergoryPanel());
+        tabbedPane.addTab("Add Category", createAddCategoryPanel());
         tabbedPane.addTab("Create Account", createAddAccountPanel());
 
 
@@ -163,11 +169,13 @@ public class BookshopGUI implements ActionListener {
 
             tabbedPane.setEnabledAt(3, true);
             tabbedPane.setEnabledAt(4, true);
+            tabbedPane.setEnabledAt(5, true);
         }
         else if(role.equals("Cashier")) {
 
             tabbedPane.setEnabledAt(3, false);
             tabbedPane.setEnabledAt(4, false);
+            tabbedPane.setEnabledAt(5, false);
         }
 
         //mainPanel.add(searchPanel, BorderLayout.NORTH);
@@ -181,6 +189,7 @@ public class BookshopGUI implements ActionListener {
 
         mainFrame.setContentPane(mainPanel);
         mainFrame.pack();
+        mainFrame.setLocationRelativeTo(null); // center the frame on the screen
         mainFrame.setVisible(true);
 
         priceRadioButton.addActionListener(this);
@@ -189,7 +198,7 @@ public class BookshopGUI implements ActionListener {
     }
 
 
-    private JPanel createAddCatergoryPanel() {
+    private JPanel createAddCategoryPanel() {
         JPanel inputPanel = new JPanel(new GridBagLayout());
         inputPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
@@ -243,7 +252,6 @@ public class BookshopGUI implements ActionListener {
 
         return inputPanel;
     }
-
 
     private JPanel createStockPanel(){
         JPanel panel = new JPanel();
@@ -307,7 +315,6 @@ public class BookshopGUI implements ActionListener {
 
         return inputPanel;
     }
-
 
     private JPanel createAllBookPanel() {
         booksTable = new JTable();
@@ -384,7 +391,7 @@ public class BookshopGUI implements ActionListener {
         return addBookPanel;
     }
 
-    private JPanel createSerchBar(){
+    private JPanel createSearchBar(){
         JPanel searchBar = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10)); // Add spacing between components
         searchBar.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Add an empty border for padding
 
@@ -405,7 +412,7 @@ public class BookshopGUI implements ActionListener {
 
         JPanel searchPanel = new JPanel(new BorderLayout());
         booksTable = new JTable();
-        searchPanel.add(createSerchBar(), BorderLayout.NORTH);
+        searchPanel.add(createSearchBar(), BorderLayout.NORTH);
         searchPanel.add(scrollPane, BorderLayout.CENTER);
 
         //searchPanel.add(new JScrollPane(booksTable), BorderLayout.CENTER);
@@ -421,7 +428,7 @@ public class BookshopGUI implements ActionListener {
         JLabel titleLabel = new JLabel(book.getTitle(), SwingConstants.CENTER);
         JLabel authorLabel = new JLabel(book.getAuthor(), SwingConstants.CENTER);
         JLabel priceLabel = new JLabel(String.valueOf(book.getPrice()), SwingConstants.CENTER);
-        JLabel categoryLabel = new JLabel(book.getCategory().toString(), SwingConstants.CENTER);
+        JLabel categoryLabel = new JLabel(book.getCategory(), SwingConstants.CENTER);
         JLabel quantityLabel = new JLabel("Available: "+ String.valueOf(book.getQuantity()), SwingConstants.CENTER);
 
         JPanel labelsPanel = new JPanel(new GridLayout(5, 1));
@@ -436,8 +443,6 @@ public class BookshopGUI implements ActionListener {
         return cardPanel;
     }
 
-
-
     @Override
     public void actionPerformed(ActionEvent e) {
 
@@ -446,7 +451,7 @@ public class BookshopGUI implements ActionListener {
             try {
                 String title = titleTextField.getText();
                 String author = authorTextField.getText();
-                String category = categoryComboBox.getSelectedItem().toString();
+                String category = Objects.requireNonNull(categoryComboBox.getSelectedItem()).toString();// please check.................................
                 double price = Double.parseDouble(priceTextField.getText());
                 int quantity = Integer.parseInt(quantityTextField.getText());
                 int bookId = Integer.parseInt(bookIdTextField.getText());
@@ -461,9 +466,6 @@ public class BookshopGUI implements ActionListener {
                 JOptionPane.showMessageDialog(mainFrame, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
 
-
-
-
         }
         if (e.getSource() == addAcountButton) {
 
@@ -475,7 +477,7 @@ public class BookshopGUI implements ActionListener {
                 bookshopServices.createAccount(userId,name,role);
 
                 JOptionPane.showMessageDialog(mainFrame, "Account added successfully.");
-                clearAdcountFields();
+                clearAccountFields();
             }
             catch (IllegalArgumentException ex){
                 JOptionPane.showMessageDialog(mainFrame, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -507,11 +509,17 @@ public class BookshopGUI implements ActionListener {
             if (nameRadioButton.isSelected()) {
                 results = bookshopServices.searchBooksByName(searchTerm);
             } else if (priceRadioButton.isSelected()) {
-                double min = Integer.parseInt(minTextField.getText());
-                double max = Integer.parseInt(maxTextField.getText());
-                results = bookshopServices.searchBooksByPrice(min,max);
+                try {
+                    double min = Integer.parseInt(minTextField.getText());
+                    double max = Integer.parseInt(maxTextField.getText());
+                    results = bookshopServices.searchBooksByPrice(min,max);
+                }
+                catch (IllegalArgumentException ex){
+                    JOptionPane.showMessageDialog(mainFrame, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
+
             } else if (categoryRadioButton.isSelected()) {
-                String category = categoryComboBox.getSelectedItem().toString();
+                String category = Objects.requireNonNull(categoryComboBox.getSelectedItem()).toString();
                 results = bookshopServices.searchBooksByCategory(category);
             }
 
@@ -528,6 +536,7 @@ public class BookshopGUI implements ActionListener {
                 mainFrame.repaint();
 
             }
+            assert results != null;
             if(results.isEmpty()){
                 JOptionPane.showMessageDialog(mainFrame, "No Results! " , "Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -546,7 +555,10 @@ public class BookshopGUI implements ActionListener {
                 String categoryDes = categoryDescriptionField.getText();
                 bookshopServices.addCategory(new BookCategory(categoryId,categoryName,categoryDes));
                 JOptionPane.showMessageDialog(mainFrame, "Category added successfully.");
-                clearAdcountFields();
+
+                categoryIdField.setText("");
+                categoryNameField.setText("");
+                categoryDescriptionField.setText("");
             }
             catch (IllegalArgumentException ex){
                 JOptionPane.showMessageDialog(mainFrame, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -557,7 +569,7 @@ public class BookshopGUI implements ActionListener {
 
     }
 
-    private void clearAdcountFields() {
+    private void clearAccountFields() {
         nameField.setText("");
         userIdField.setText("");
         roleComboBox.setSelectedIndex(0);
@@ -571,6 +583,7 @@ public class BookshopGUI implements ActionListener {
         bookIdTextField.setText("");
         categoryComboBox.setSelectedIndex(0);
     }
+
 
 }
 

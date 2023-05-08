@@ -1,22 +1,15 @@
 import Database.ExcelDatabase;
-import GUI.BookshopGUI;
-import GUI.LoginPage;
-import Models.Book;
-import Models.BookCategory;
 import Models.BookshopServices;
-import Models.Manager;
-
-import java.util.List;
+import UI.GUI.GUI;
+import UI.UI;
 
 public class City_Bookshop {
     public static void main(String[] args) {
 
-
-
-        LoginPage loginPage = new LoginPage();
-
-
-
+        ExcelDatabase excelDatabase = new ExcelDatabase();
+        BookshopServices bookshopServices = new BookshopServices(excelDatabase);
+        UI gui = new GUI(bookshopServices);
+        gui.show();
 
     }
 }
