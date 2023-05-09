@@ -2,11 +2,12 @@ package Models;
 
 import Models.Interfaces.IBook;
 
+
 public class Book implements IBook {
     private int id;
-    private String title;
-    private String author;
-    private double price;
+    private final String title;
+    private final String author;
+    private final double price;
     private int quantity;
     private String bookCategory;
 
@@ -17,6 +18,24 @@ public class Book implements IBook {
         this.price = price;
         this.quantity = quantity;
         this.bookCategory = bookCategory;
+    }
+
+    public Book(int id, String title, String author, double price, int quantity) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+        this.price = price;
+        this.quantity = quantity;
+        this.bookCategory = "None";
+    }
+
+    public Book(int id, String title, String author, double price) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+        this.price = price;
+        this.quantity = 0;
+        this.bookCategory = "None";
     }
 
     @Override

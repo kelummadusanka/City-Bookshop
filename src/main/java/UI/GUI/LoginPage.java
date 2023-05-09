@@ -1,6 +1,9 @@
 package UI.GUI;
 
 import Models.BookshopServices;
+import Models.Cashier;
+import Models.Employee;
+import Models.Manager;
 import UI.UI;
 
 import javax.swing.*;
@@ -9,7 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class LoginPage extends JFrame implements UI {
-    private BookshopServices bookshopServices;
+    private final BookshopServices bookshopServices;
     private JButton managerButton;
     private JButton cashierButton;
     private JPanel loginPanel;

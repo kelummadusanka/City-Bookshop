@@ -1,6 +1,8 @@
 package UI.GUI;
 
-import Models.*;
+import Models.Book;
+import Models.BookCategory;
+import Models.BookshopServices;
 import UI.UI;
 
 import javax.swing.*;
@@ -11,7 +13,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class Dashboard implements ActionListener, UI {
-    private BookshopServices bookshopServices;
+    private final BookshopServices bookshopServices;
 
     private JFrame mainFrame;
     private JPanel mainPanel;
@@ -36,7 +38,7 @@ public class Dashboard implements ActionListener, UI {
     private JTextField categoryIdField;
     private JTextField categoryNameField;
     private JTextField categoryDescriptionField;
-    private JTextField quantityTextField;;
+    private JTextField quantityTextField;
     private JTextField bookIdTextField;
     private JTextField titleTextField;
     private JTextField authorTextField;
@@ -65,13 +67,15 @@ public class Dashboard implements ActionListener, UI {
     private JComboBox<String> roleComboBox;
     private JButton createAccountButton;
 
-    private String role;
+    private final String role;
 
     public Dashboard(BookshopServices bookshopServices, String role) {
         this.bookshopServices = bookshopServices;
         this.role = role;
 
     }
+
+
     @Override
     public void show() {
         createGUI();
@@ -156,8 +160,8 @@ public class Dashboard implements ActionListener, UI {
         booksTable.setModel(bookModel);
 
         tabbedPane = new JTabbedPane();
-        tabbedPane.addTab("Search Books", createSearchPanel());
         tabbedPane.addTab("All Books", createAllBookPanel());
+        tabbedPane.addTab("Search Books", createSearchPanel());
         tabbedPane.addTab("Stock Details", createStockPanel());
         tabbedPane.addTab("Add Book", createAddBookPanel());
         tabbedPane.addTab("Add Category", createAddCategoryPanel());
@@ -170,12 +174,15 @@ public class Dashboard implements ActionListener, UI {
             tabbedPane.setEnabledAt(3, true);
             tabbedPane.setEnabledAt(4, true);
             tabbedPane.setEnabledAt(5, true);
+
         }
         else if(role.equals("Cashier")) {
 
             tabbedPane.setEnabledAt(3, false);
             tabbedPane.setEnabledAt(4, false);
             tabbedPane.setEnabledAt(5, false);
+
+
         }
 
         //mainPanel.add(searchPanel, BorderLayout.NORTH);
@@ -429,7 +436,7 @@ public class Dashboard implements ActionListener, UI {
         JLabel authorLabel = new JLabel(book.getAuthor(), SwingConstants.CENTER);
         JLabel priceLabel = new JLabel(String.valueOf(book.getPrice()), SwingConstants.CENTER);
         JLabel categoryLabel = new JLabel(book.getCategory(), SwingConstants.CENTER);
-        JLabel quantityLabel = new JLabel("Available: "+ String.valueOf(book.getQuantity()), SwingConstants.CENTER);
+        JLabel quantityLabel = new JLabel("Available: "+ book.getQuantity(), SwingConstants.CENTER);
 
         JPanel labelsPanel = new JPanel(new GridLayout(5, 1));
         labelsPanel.add(titleLabel);
@@ -456,8 +463,7 @@ public class Dashboard implements ActionListener, UI {
                 int quantity = Integer.parseInt(quantityTextField.getText());
                 int bookId = Integer.parseInt(bookIdTextField.getText());
 
-                Book book = new Book(bookId,title, author, price,quantity, category);
-                bookshopServices.addBook(book);
+                bookshopServices.addBook(bookId,title, author, price,quantity, category);
 
                 JOptionPane.showMessageDialog(mainFrame, "Book added successfully.");
                 clearAddBookFields();
@@ -470,6 +476,7 @@ public class Dashboard implements ActionListener, UI {
         if (e.getSource() == addAcountButton) {
 
             try {
+
                 String name = nameField.getText();
                 int userId = Integer.parseInt(userIdField.getText());
                 String role = (String) roleComboBox.getSelectedItem();
@@ -555,18 +562,21 @@ public class Dashboard implements ActionListener, UI {
                 String categoryDes = categoryDescriptionField.getText();
                 bookshopServices.addCategory(new BookCategory(categoryId,categoryName,categoryDes));
                 JOptionPane.showMessageDialog(mainFrame, "Category added successfully.");
-
-                categoryIdField.setText("");
-                categoryNameField.setText("");
-                categoryDescriptionField.setText("");
+                clearCategoryFields();
             }
             catch (IllegalArgumentException ex){
                 JOptionPane.showMessageDialog(mainFrame, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-
+                clearCategoryFields();
             }
 
         }
 
+    }
+
+    private void clearCategoryFields(){
+        categoryIdField.setText("");
+        categoryNameField.setText("");
+        categoryDescriptionField.setText("");
     }
 
     private void clearAccountFields() {

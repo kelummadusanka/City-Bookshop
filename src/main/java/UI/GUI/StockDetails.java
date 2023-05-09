@@ -27,7 +27,7 @@ public class StockDetails extends JPanel {
     private class BookDetailsBox extends JComponent {
         private static final int BOX_HEIGHT = 80;
         private static final int BOX_WIDTH = 500;
-        private Book book;
+        private final Book book;
 
         public BookDetailsBox(Book book) {
             this.book = book;

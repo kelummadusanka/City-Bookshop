@@ -4,7 +4,7 @@ import Models.BookshopServices;
 import UI.UI;
 
 public class GUI implements UI {
-    private BookshopServices bookshopServices;
+    private final BookshopServices bookshopServices;
     public GUI(BookshopServices bookshopServices) {
         this.bookshopServices=bookshopServices;
     }

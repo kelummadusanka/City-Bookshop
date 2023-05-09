@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class ExcelDatabase {
@@ -21,7 +22,7 @@ public class ExcelDatabase {
     private Sheet accountsSheet;
     private Sheet bookCategoriesSheet;
 
-    private String filename;
+    private final String filename;
 
     public ExcelDatabase() {
         filename = "src/main/resources//ExcelDB.xlsx";
@@ -53,8 +54,8 @@ public class ExcelDatabase {
 
         Sheet accountSheet = workbook.getSheet("account");
         Row accountHeaderRow = accountSheet.createRow(0);
-        accountHeaderRow.createCell(0).setCellValue("Name");
-        accountHeaderRow.createCell(1).setCellValue("ID");
+        accountHeaderRow.createCell(0).setCellValue("ID");
+        accountHeaderRow.createCell(1).setCellValue("Name");
         accountHeaderRow.createCell(2).setCellValue("Account Type");
 
         Sheet bookCategorySheet = workbook.getSheet("bookCategory");
@@ -193,14 +194,14 @@ public class ExcelDatabase {
         }
     }
 
+    //---------------------------------------------------------------
 
-
-    public List<UserAccount> getAllAccounts() {
-        List<UserAccount> accounts = new ArrayList<>();
+    public List<Employee> getAllAccounts() {
+        List<Employee> accounts = new ArrayList<>();
 
         try (FileInputStream fis = new FileInputStream(filename)) {
             workbook = WorkbookFactory.create(fis);
-            accountsSheet = workbook.getSheet("accounts");
+            accountsSheet = workbook.getSheet("account");
 
             for (int i = 1; i <= accountsSheet.getLastRowNum(); i++) {
                 Row row = accountsSheet.getRow(i);
@@ -213,7 +214,7 @@ public class ExcelDatabase {
                         Manager manager = new Manager(id, name, type);
                         accounts.add(manager);
                     } else if (type.equals("Cashier")) {
-                        Cashier cashier = new Cashier(id, name, type);
+                       Cashier cashier = new Cashier(id, name, type);
                         accounts.add(cashier);
                     }
                 }
@@ -291,7 +292,7 @@ public class ExcelDatabase {
         }
     }
 
-    public void updateAccount(UserAccount account) {
+    public void updateAccount(Employee account) {
         try (FileInputStream fis = new FileInputStream(filename)) {
             workbook = WorkbookFactory.create(fis);
             accountsSheet = workbook.getSheet("account");

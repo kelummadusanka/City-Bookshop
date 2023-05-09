@@ -13,8 +13,8 @@ public class BooksTableModel extends AbstractTableModel {
     private static final int PRICE_COL = 3;
     private static final int QUANTITY_COL = 4;
     private static final int CATEGORY_COL = 5;
-    private String[] columnNames = {"ID", "Title", "Author", "Price", "Quantity", "Category"};
-    private List<Book> books;
+    private final String[] columnNames = {"ID", "Title", "Author", "Price", "Quantity", "Category"};
+    private final List<Book> books;
 
     public BooksTableModel(List<Book> books) {
         this.books = books;
